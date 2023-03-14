@@ -3762,7 +3762,28 @@ select
 	end as new_student_name
 from students
 ```
-
+Solution where the last name is not changed : 
+WITH
+  c AS (
+  SELECT
+    COUNT(*) AS nb_ligne
+  FROM
+    RimDataset.students)
+SELECT
+  id,
+  student_name,
+  CASE
+    WHEN MOD(id,2)= 1 AND MOD(id,c.nb_ligne)<> 0 THEN LEAD(student_name) OVER(ORDER BY id)
+    WHEN MOD(id,2) = 0 THEN LAG(student_name) OVER(ORDER BY id)
+    WHEN MOD(id,c.nb_ligne)=0 THEN student_name
+END
+  AS new_student_name
+FROM
+  RimDataset.students,
+  c
+ORDER BY
+  id;
+  
 ## 18.7. Exercise 7
 
 ```sql
